@@ -1,4 +1,12 @@
-def resize(path,outpath):
+# resize(path,outpath):
+# Function parameter 
+#	1. path : absolute path of the original image,  like '/Home/projects/final/image/21.jpg'
+#	2. path : absolute intented path of the output image 
+#	3. sizeOfW, integer, the size of the output image's width
+#	4. sizeOfH, integer, the size of the output image's height
+#
+
+def resize(path,outpath,sizeOfW,sizeOfH):
 	from PIL import Image
 	import numpy
 	im = Image.open(path)
@@ -83,8 +91,8 @@ def resize(path,outpath):
 	imOut = im.crop((LeftTopJ,LeftTopI, RightDownJ, RightDownI ))
 
 
-	basewidth = 300
-	baseheight = 300
+	basewidth = sizeOfW
+	baseheight = sizeOfH
 	#wpercent = (basewidth/float(imOut.size[0]))
 	#hsize = int((float(imOut.size[1])*float(wpercent)))
 	imOut = imOut.resize((basewidth,baseheight), Image.ANTIALIAS)
