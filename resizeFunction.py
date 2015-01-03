@@ -21,24 +21,22 @@ def resize(path,outpath,sizeOfW,sizeOfH):
 	RightFirstI=0
 	RightFirstJ=0
 
-	RGBThreshold = 120*3;
+	RGBThreshold = 25;
 
-	for i in range(im.size[0]):
-		for j in range(im.size[1]):
+	for i in range(0,im.size[0]-1,1):
+		for j in range(0,im.size[1]-1,1):
 			rgbAdded = 0;
-			for k in range(imarray[i][j].size):
-				rgbAdded = rgbAdded + imarray[i][j][k]
+			rgbAdded = rgbAdded + imarray[j][i]
 			if(rgbAdded>=RGBThreshold):
 				TopFirstI=i
 				TopFirstJ=j
 
 
 
-	for j in range(im.size[1]):
-		for i in range(im.size[0]):
+	for j in range(0,im.size[1]-1,1):
+		for i in range(0,im.size[0]-1,1):
 			rgbAdded = 0;
-			for k in range(imarray[i][j].size):
-				rgbAdded = rgbAdded + imarray[i][j][k]
+			rgbAdded = rgbAdded + imarray[j][i]
 			if(rgbAdded>=RGBThreshold):
 				LeftFirstI=i
 				LeftFirstJ=j
@@ -48,8 +46,7 @@ def resize(path,outpath,sizeOfW,sizeOfH):
 	for i in xrange(im.size[0]-1,0,-1):
 		for j in xrange(im.size[1]-1,0,-1):
 			rgbAdded = 0;
-			for k in range(imarray[i][j].size):
-				rgbAdded = rgbAdded + imarray[i][j][k]
+			rgbAdded = rgbAdded + imarray[j][i]
 			if(rgbAdded>=RGBThreshold):
 				DownFirstI=i
 				DownFirstJ=j
@@ -59,8 +56,7 @@ def resize(path,outpath,sizeOfW,sizeOfH):
 	for j in xrange(im.size[1]-1,0,-1):
 		for i in xrange(im.size[0]-1,0,-1):
 			rgbAdded = 0;
-			for k in range(imarray[i][j].size):
-				rgbAdded = rgbAdded + imarray[i][j][k]
+			rgbAdded = rgbAdded + imarray[j][i]
 			if(rgbAdded>=RGBThreshold):
 				RightFirstI=i
 				RightFirstJ=j
@@ -85,11 +81,35 @@ def resize(path,outpath,sizeOfW,sizeOfH):
 	else:
 		LeftTopJ = RightFirstJ
 
-	print 'TF i,j : (',LeftTopI,',',LeftTopJ,')'
-	print 'RD i,j : (',RightDownI,',',RightDownJ,')'
+	#print 'TF i,j : (',LeftTopI,',',LeftTopJ,')'
+	#print 'RD i,j : (',RightDownI,',',RightDownJ,')'
 
-	imOut = im.crop((LeftTopJ,LeftTopI, RightDownJ, RightDownI ))
 
+
+	miniW = 50
+	miniH = 50	
+	if(RightDownI - LeftTopI <= miniW):
+		diffW = miniW- (RightDownI - LeftTopI)
+		while(diffW>=0):
+			if(LeftTopI-1>=0):
+				LeftTopI=LeftTopI-1
+				diffW=diffW-1
+			if(RightDownI+1<im.size[0]):
+				RightDownI=RightDownI+1
+				diffW=diffW-1
+
+	if(RightDownJ - LeftTopJ <= miniH):
+		diffH = miniH- (RightDownJ - LeftTopJ)
+		while(diffH>=0):
+			if(LeftTopJ-1>=0):
+				LeftTopJ=LeftTopJ-1
+				diffH=diffH-1
+			if(RightDownJ+1<im.size[1]):
+				RightDownJ=RightDownJ+1
+				diffH=diffH-1
+
+	
+	imOut = im.crop((LeftTopI,LeftTopJ, RightDownI,RightDownJ))
 
 	basewidth = sizeOfW
 	baseheight = sizeOfH
@@ -99,5 +119,25 @@ def resize(path,outpath,sizeOfW,sizeOfH):
 	imOut.save(outpath)
 
 
+import glob
+import os
 
+for a in ('train','val'):
+	for i in range(0,32,1):	
+		print 'Now processing: '+a+' '+`i`+' class'
+		os.chdir("/home/logocat/handwrite/images_original_data/images_"+a+"/"+`i`+"/")
+		now_path = "/home/logocat/handwrite/images_original_data/images_"+a+"/"+`i`+"/"
+		dis_path = "/home/logocat/handwrite/images_original_data/images_"+a+"_cropped/"+`i`+"/"
+		if not os.path.exists(dis_path): os.makedirs(dis_path)		
+		for file in glob.glob("*.jpg"):
+			resize(now_path+file,dis_path+file,105,122)
 
+for a in ('ans',):
+	for i in range(100,101,1):	
+		print 'Now processing: '+a+' '+`i`+' class'
+		os.chdir("/home/logocat/handwrite/images_original_data/images_"+a+"/"+`i`+"/")
+		now_path = "/home/logocat/handwrite/images_original_data/images_"+a+"/"+`i`+"/"
+		dis_path = "/home/logocat/handwrite/images_original_data/images_"+a+"_cropped/"+`i`+"/"
+		if not os.path.exists(dis_path): os.makedirs(dis_path)	
+		for file in glob.glob("*.jpg"):
+			resize(now_path+file,dis_path+file,105,122)
